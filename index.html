@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Happy Birthday Priti</title>
+<meta name="description" content="A cinematic birthday celebration for Anushri memories, gratitude and a whole lot of sparkle." />
+<meta name="theme-color" content="#1c0f33" />
+
+<!--
+  ============================================================================
+  QUICK EDIT GUIDE
+  ----------------------------------------------------------------------------
+  1. PHOTOS   -> put 15 images in /assets/photos/ named photo1.jpg ... photo15.jpg
+                 (already pre-filled with sample photos — just overwrite them)
+  2. MUSIC    -> put one audio file at /assets/music/music.mp3
+  3. DATES    -> open script.js and edit the CONFIG object at the very top
+                 (her birth date + when your friendship began)
+  4. COLORS   -> open style.css and edit the ":root" CSS variables at the top
+  5. TEXT     -> search this file for "EDIT:" comments — every block of
+                 personal text is marked so you can find it quickly
+  ============================================================================
+-->
+
+<!-- Fonts: elegant display serif + script + clean body sans-serif -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Great+Vibes&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<!-- ==========================================================================
+     LOADER
+     ========================================================================== -->
+<div id="loader" aria-hidden="true">
+  <div class="loader-gift">
+    <svg viewBox="0 0 120 120" role="img" aria-label="Animated gift box">
+      <defs>
+        <linearGradient id="giftGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ff8fb3"/>
+          <stop offset="100%" stop-color="#b28dff"/>
+        </linearGradient>
+      </defs>
+      <rect x="22" y="55" width="76" height="50" rx="6" fill="url(#giftGrad)"/>
+      <rect x="55" y="55" width="10" height="50" fill="#ffd27a"/>
+      <g class="gift-lid">
+        <rect x="16" y="40" width="88" height="20" rx="6" fill="#ffd27a"/>
+        <rect x="55" y="40" width="10" height="20" fill="#ff6f9c"/>
+        <path d="M60 40 C40 15,15 20,30 38 Z" fill="#ff8fb3"/>
+        <path d="M60 40 C80 15,105 20,90 38 Z" fill="#b28dff"/>
+      </g>
+    </svg>
+    <div class="loader-sparks" id="loader-sparks"></div>
+  </div>
+  <p class="loader-text">Preparing Something Special<span class="dots"><span>.</span><span>.</span><span>.</span></span></p>
+  <div class="loader-bar"><div class="loader-bar-fill" id="loader-bar-fill"></div></div>
+  <p class="loader-hint">tap anywhere to begin</p>
+</div>
+
+<!-- Interaction gate: browsers block autoplay audio, so we ask for one tap/click -->
+<div id="enter-screen">
+  <h1>A little surprise awaits</h1>
+  <p>Turn your sound on for the full experience, then step inside.</p>
+  <button class="btn" id="enter-btn">Begin the Celebration ✨</button>
+</div>
+
+<!-- ==========================================================================
+     GLOBAL FX LAYERS
+     ========================================================================== -->
+<div id="cursor-glow" aria-hidden="true"></div>
+<canvas id="trail-canvas" aria-hidden="true"></canvas>
+<div id="scroll-progress" role="progressbar" aria-label="Scroll progress" aria-hidden="true"></div>
+
+<nav id="floating-nav" aria-label="Section navigation">
+  <button data-target="#hero" data-label="Welcome" class="active" aria-label="Go to Welcome"></button>
+  <button data-target="#cake-section" data-label="Cake" aria-label="Go to Cake"></button>
+  <button data-target="#timeline-section" data-label="Timeline" aria-label="Go to Timeline"></button>
+  <button data-target="#gallery-section" data-label="Gallery" aria-label="Go to Gallery"></button>
+  <button data-target="#book-section" data-label="Memory Book" aria-label="Go to Memory Book"></button>
+  <button data-target="#quotes-section" data-label="Quotes" aria-label="Go to Quotes"></button>
+  <button data-target="#wishes-section" data-label="Wishes" aria-label="Go to Wishes"></button>
+  <button data-target="#stars-section" data-label="Stars" aria-label="Go to Stars"></button>
+  <button data-target="#lantern-section" data-label="Lantern" aria-label="Go to Lantern"></button>
+  <button data-target="#countdown-section" data-label="Countdown" aria-label="Go to Countdown"></button>
+  <button data-target="#tree-section" data-label="Memory Tree" aria-label="Go to Memory Tree"></button>
+  <button data-target="#ending-section" data-label="Finale" aria-label="Go to Finale"></button>
+</nav>
+
+<!-- Music player: EDIT the <source> below once you add /assets/music/music.mp3 -->
+<div id="music-player" class="glass">
+  <audio id="bg-music" loop preload="none">
+    <source src="assets/music/music.mpeg" type="audio/mpeg" />
+  </audio>
+  <button id="music-toggle" aria-label="Play background music">
+    <svg class="icon-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    <svg class="icon-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+  </button>
+  <div id="music-bars" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div id="music-extra">
+    <button id="music-mute" aria-label="Mute music">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 10v4h4l5 5V5L7 10H3z"/></svg>
+    </button>
+    <input type="range" id="music-volume" min="0" max="1" step="0.01" value="0.5" aria-label="Music volume" />
+  </div>
+</div>
+
+<main id="main-content">
+
+<!-- ==========================================================================
+     SECTION 1 — HERO / WELCOME
+     ========================================================================== -->
+<section id="hero" class="section">
+  <div class="hero-bg-gradient" aria-hidden="true"></div>
+  <div class="hero-vignette" aria-hidden="true"></div>
+  <canvas class="bg-canvas" id="hero-particles" aria-hidden="true"></canvas>
+
+  <svg class="ribbon-svg" viewBox="0 0 600 120" aria-hidden="true">
+    <path d="M0,60 C150,-10 450,130 600,60" stroke="url(#ribbonGrad)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <defs><linearGradient id="ribbonGrad" x1="0" x2="1"><stop offset="0%" stop-color="#ff8fb3"/><stop offset="50%" stop-color="#ffd27a"/><stop offset="100%" stop-color="#b28dff"/></linearGradient></defs>
+  </svg>
+
+  <div id="balloon-field" aria-hidden="true"></div>
+
+  <div class="hero-content">
+    <span class="hero-eyebrow">A Celebration Made With Care</span>
+    <h1 class="hero-title"><span class="letters" data-text="Happy Birthday"></span></h1>
+    <!-- EDIT: her name -->
+    <p class="hero-name">Priti</p>
+    <!-- EDIT: hero subtitle -->
+    <p class="hero-sub">Today the world gets to celebrate someone who fills every room with warmth, laughter and the kind of friendship people write stories about.</p>
+    <button class="btn" id="hero-cta">Unwrap the Surprise 🎁</button>
+  </div>
+
+  <div class="hero-scroll-cue"><span class="scroll-mouse" aria-hidden="true"></span>SCROLL</div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 2 — BIRTHDAY CAKE
+     ========================================================================== -->
+<section id="cake-section" class="section section--night">
+  <div class="section-inner cake-wrap">
+    <span class="eyebrow">Make A Wish</span>
+    <h2 class="section-title reveal">One Candle, One Wish</h2>
+    <p class="section-sub reveal" style="margin-inline:auto;text-align:center;">Every great year deserves a proper send-off. Blow the candles and let this one go out in style.</p>
+
+    <div class="cake-stage reveal-scale">
+      <svg class="cake-svg" viewBox="0 0 320 320" id="cake-svg" aria-label="Animated birthday cake illustration">
+        <defs>
+          <linearGradient id="tierGrad1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffd9e6"/><stop offset="100%" stop-color="#ff8fb3"/>
+          </linearGradient>
+          <linearGradient id="tierGrad2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e3d3ff"/><stop offset="100%" stop-color="#b28dff"/>
+          </linearGradient>
+          <linearGradient id="plateGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#ffd27a"/><stop offset="100%" stop-color="#ff8fb3"/>
+          </linearGradient>
+        </defs>
+        <ellipse cx="160" cy="270" rx="120" ry="16" fill="url(#plateGrad)" opacity=".8"/>
+        <rect x="70" y="190" width="180" height="80" rx="14" fill="url(#tierGrad2)"/>
+        <rect x="70" y="190" width="180" height="16" fill="#fff" opacity=".5"/>
+        <rect x="95" y="120" width="130" height="80" rx="14" fill="url(#tierGrad1)"/>
+        <rect x="95" y="120" width="130" height="16" fill="#fff" opacity=".5"/>
+        <g id="candles">
+          <!-- 3 candles: JS listens for clicks on .candle-flame's parent to "blow" -->
+          <g class="candle" data-candle="1">
+            <rect x="130" y="90" width="7" height="32" fill="#fff8f0"/>
+            <ellipse class="candle-flame" cx="133.5" cy="86" rx="6" ry="12" fill="#ffb347"/>
+            <ellipse cx="133.5" cy="88" rx="3" ry="6" fill="#fff3c4"/>
+          </g>
+          <g class="candle" data-candle="2">
+            <rect x="156" y="82" width="7" height="40" fill="#fff8f0"/>
+            <ellipse class="candle-flame" cx="159.5" cy="78" rx="6" ry="12" fill="#ffb347"/>
+            <ellipse cx="159.5" cy="80" rx="3" ry="6" fill="#fff3c4"/>
+          </g>
+          <g class="candle" data-candle="3">
+            <rect x="182" y="90" width="7" height="32" fill="#fff8f0"/>
+            <ellipse class="candle-flame" cx="185.5" cy="86" rx="6" ry="12" fill="#ffb347"/>
+            <ellipse cx="185.5" cy="88" rx="3" ry="6" fill="#fff3c4"/>
+          </g>
+        </g>
+        <g fill="#fff" opacity=".85">
+          <circle cx="110" cy="210" r="4"/><circle cx="150" cy="220" r="4"/><circle cx="190" cy="210" r="4"/><circle cx="215" cy="225" r="4"/><circle cx="90" cy="225" r="4"/>
+        </g>
+      </svg>
+      <div id="smoke-container" aria-hidden="true"></div>
+    </div>
+
+    <p class="cake-hint" id="cake-hint">Click the candles to blow them out</p>
+    <button class="btn cake-cta" id="cake-blow-btn">Blow The Candles</button>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 3 — FRIENDSHIP TIMELINE
+     EDIT: years/captions below to match your real memories
+     ========================================================================== -->
+<section id="timeline-section" class="section section--dream">
+  <div class="section-inner">
+    <span class="eyebrow">Our Story So Far</span>
+    <h2 class="section-title reveal">A Friendship Timeline</h2>
+    <p class="section-sub reveal">A few of the moments that turned into memories worth keeping.</p>
+
+    <div class="timeline-track" tabindex="0" role="region" aria-label="Our story timeline, scroll horizontally">
+
+      <div class="timeline-card glass reveal">
+        <span class="timeline-dot"></span>
+        <span class="timeline-year">09 OCT 2001</span>
+        <p>
+          The day Priti was born. I obviously wasn't there to know it then,
+          but years later, I would meet the person who would become such an
+          important part of my life.
+        </p>
+      </div>
+    
+      <div class="timeline-card glass reveal">
+        <span class="timeline-dot"></span>
+        <span class="timeline-year">COLLEGE</span>
+        <p>
+          The first time we met. Just another normal day at college at the time,
+          but looking back now, I realise how special that beginning actually was.
+        </p>
+      </div>
+    
+      <div class="timeline-card glass reveal">
+        <span class="timeline-dot"></span>
+        <span class="timeline-year">THE BEGINNING</span>
+        <p>
+          We started talking, spending time together and slowly getting to know
+          each other. Nothing dramatic just two people becoming friends,
+          one conversation at a time.
+        </p>
+      </div>
+    
+      <div class="timeline-card glass reveal">
+        <span class="timeline-dot"></span>
+        <span class="timeline-year">SOMEWHERE ALONG THE WAY</span>
+        <p>
+          Somewhere between all the conversations, jokes, random moments and
+          everything in between, you stopped being just a college friend.
+          You became my best friend.
+        </p>
+      </div>
+    
+      <div class="timeline-card glass reveal">
+        <span class="timeline-dot"></span>
+        <span class="timeline-year">THE MEMORIES</span>
+        <p>
+          The little things became the memories I value the most the random
+          conversations, the laughs, the silly moments and all those things
+          that probably seemed ordinary when they happened.
+        </p>
+      </div>
+    
+      <div class="timeline-card glass reveal">
+        <span class="timeline-dot"></span>
+        <span class="timeline-year">TODAY</span>
+        <p>
+          Years after that first meeting, here we are. And somehow, the person
+          I met in college has become someone I cannot imagine my story without.
+        </p>
+      </div>
+    
+      <div class="timeline-card glass reveal">
+        <span class="timeline-dot"></span>
+        <span class="timeline-year">09 OCT 2026</span>
+        <p>
+          Your 25th birthday. A new chapter for you, another memory for us,
+          and hopefully the beginning of many more pages in our story.
+          Happy Birthday, Piyu. ❤️
+        </p>
+      </div>
+    
+    </div>
+    <p class="timeline-hint">← swipe to explore the timeline →</p>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 4 — PHOTO GALLERY (15 photos, each with a unique reveal animation)
+     ========================================================================== -->
+<section id="gallery-section" class="section section--night">
+  <div class="section-inner">
+    <span class="eyebrow">Frozen In Time</span>
+    <h2 class="section-title reveal">The Photo Gallery</h2>
+    <p class="section-sub reveal">Fifteen moments, fifteen stories, one beautiful friendship.</p>
+    <div class="gallery-grid" id="gallery-grid"><!-- populated by script.js: builds 15 .photo-card elements --></div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 5 — MEMORY BOOK
+     EDIT: page text below
+     ========================================================================== -->
+<section id="book-section" class="section section--dream">
+  <div class="section-inner" style="display:flex;flex-direction:column;align-items:center;">
+    <span class="eyebrow">Turn The Page</span>
+    <h2 class="section-title reveal">The Memory Book</h2>
+    <p class="section-sub reveal" style="text-align:center;">A little book of moments worth re-reading.</p>
+
+    <div class="book glass reveal-scale" id="book" role="group" aria-label="Memory book">
+
+      <article class="book-page" data-page="1" style="z-index:6;">
+        <h3>Where It All Began</h3>
+        <p>
+          09 October 2001 was the day you came into this world.
+          Years later, I happened to meet you in college, without knowing that
+          this person would eventually become such an important part of my life.
+          Funny how some of the biggest chapters of our lives begin so normally.
+        </p>
+        <span class="page-number">01</span>
+      </article>
+    
+      <article class="book-page" data-page="2" style="z-index:5;">
+        <h3>Somewhere Along The Way</h3>
+        <p>
+          I still remember the day our story truly began - 3 December 2022.
+          Our seniors created a Documentation Team, and both you and I became part
+          of it. That was the day we had our first real conversation. What started
+          as simple communication for our work slowly became something much more
+          meaningful. From that day, we started knowing each other through
+          conversations, laughs, random talks, and all the little moments we shared.
+          Looking back now, I realize that 3 December 2022 wasn't just the day we
+          became teammates. It was the day I met someone who would eventually
+          become one of the most important people in my life.
+        </p>
+        <span class="page-number">02</span>
+      </article>
+    
+      <article class="book-page" data-page="3" style="z-index:4;">
+        <h3>More Than A Best Friend</h3>
+        <p>
+          If someone asks me who Priti is, saying "my best friend" feels like
+          an easy answer, but it doesn't really explain everything. You are one
+          of those rare people with whom I can be completely myself, talk about
+          absolutely anything, or say nothing at all and still feel comfortable.
+        </p>
+        <span class="page-number">03</span>
+      </article>
+    
+      <article class="book-page" data-page="4" style="z-index:3;">
+        <h3>The Little Memories</h3>
+        <p>
+          Maybe years from now we won't remember every conversation or every
+          ordinary day. But I hope we remember the feeling of those days
+          the stupid jokes, the unexpected laughs, the random messages,
+          the "remember when..." moments and all the little things that became
+          our friendship.
+        </p>
+        <span class="page-number">04</span>
+      </article>
+    
+      <article class="book-page" data-page="5" style="z-index:2;">
+        <h3>Our Story Isn't Finished</h3>
+        <p>
+          Today you turn 25, and this is only another page in your story.
+          I hope the pages ahead are filled with everything you dream about.
+          And selfishly, I hope there are still many pages with our names in them
+          more birthdays, more memories, more random conversations, and many more
+          moments we haven't even lived yet.
+        </p>
+        <span class="page-number">05</span>
+      </article>
+    
+    </div>
+
+    <div class="book-controls">
+      <button class="book-nav-btn glass" id="book-prev" aria-label="Previous page">←</button>
+      <button class="book-nav-btn glass" id="book-next" aria-label="Next page">→</button>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 6 — QUOTES
+     ========================================================================== -->
+<section id="quotes-section" class="section section--night">
+  <div class="section-inner" style="text-align:center;">
+    <span class="eyebrow">Words To Remember</span>
+    <h2 class="section-title reveal">On Friendship</h2>
+
+    <div class="quote-stack">
+      <div class="quote-card reveal">
+        <span class="quote-mark">“</span>
+        <p class="quote-text">Some people enter your life as a simple college acquaintance and somehow become one of the most important people in it.</p>
+        <p class="quote-attr">— Me, about you</p>
+      </div>
+      
+      <div class="quote-card reveal">
+        <span class="quote-mark">“</span>
+        <p class="quote-text">I don't know exactly when you became more than just a best friend. I just know that life feels a little better because you're in it.</p>
+        <p class="quote-attr">- Something I've always wanted to say</p>
+      </div>
+      
+      <div class="quote-card reveal">
+        <span class="quote-mark">“</span>
+        <p class="quote-text">From our first meeting in college to all the memories after it, I'm genuinely grateful that life somehow made our paths cross.</p>
+        <p class="quote-attr">- Our story</p>
+      </div>
+      
+      <div class="quote-card reveal">
+        <span class="quote-mark">“</span>
+        <p class="quote-text">Some friendships don't need a perfect definition. They just become a place where you can be completely yourself.</p>
+        <p class="quote-attr">- For Priti</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 7 — BIRTHDAY WISHES
+     EDIT: this is the main emotional message — make it yours
+     ========================================================================== -->
+<section id="wishes-section" class="section section--dream">
+  <div class="section-inner">
+    <span class="eyebrow" style="display:block;text-align:center;">From Me To You</span>
+    <h2 class="section-title reveal" style="text-align:center;">A Few Things I Want To Say</h2>
+  
+    <div class="wishes-letter glass reveal">
+      <p>Dear Priti,</p>
+  
+      <p>
+        First of all, Happy Birthday! ❤️
+        I don't think I have ever properly told you how special you are to me,
+        so I wanted to do it here, in my own little way.
+      </p>
+  
+      <p>
+        We met in college, and honestly, at that time I had no idea that you
+        would eventually become such an important part of my life. What started
+        as simply knowing each other slowly became friendship, then a really
+        close friendship, and somewhere along the way you became my best friend.
+      </p>
+  
+      <p>
+        But even "best friend" doesn't completely explain what you mean to me.
+        You are one of those people with whom I can be completely myself.
+        We can talk about serious things, stupid things, random things, or
+        sometimes absolutely nothing, and somehow those moments still become
+        memories I want to keep.
+      </p>
+  
+      <p>
+        I am genuinely thankful for every conversation, every laugh, every
+        stupid joke, every little moment, and even the times when things
+        weren't perfect. All of them became a part of our story, and I wouldn't
+        want to replace any of it.
+      </p>
+  
+      <p>
+        Today, on your 25th birthday, I just want to wish you a life full of
+        happiness, peace, success, good people, new experiences and everything
+        you truly deserve. I hope this new chapter brings you closer to all the
+        things you dream about.
+      </p>
+  
+      <p>
+        And wherever life takes us from here, I hope we never become strangers.
+        I hope there are still many birthdays to celebrate, many random
+        conversations to have, many places to go, and many more memories waiting
+        for us.
+      </p>
+  
+      <p>
+        Thank you for being you, Priti.
+        Thank you for becoming such an important part of my life.
+        And most importantly, thank you for being my friend.
+      </p>
+  
+      <p>
+        Happy 25th Birthday! 🎂❤️
+        I hope this little surprise makes you smile, because that is the least
+        I could do for someone who has given me so many reasons to smile.
+      </p>
+  
+      <span class="wishes-sign">Always wishing the best for you ❤️</span>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 8 — FLOATING PHOTO CAROUSEL
+     ========================================================================== -->
+<section id="carousel-section" class="section section--night">
+  <div class="section-inner">
+    <span class="eyebrow">A Little Reel</span>
+    <h2 class="section-title reveal">Memories On Repeat</h2>
+  </div>
+  <div class="carousel-viewport">
+    <div class="carousel-track" id="carousel-track"><!-- populated by script.js --></div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 9 — NIGHT SKY / STARS
+     ========================================================================== -->
+<section id="stars-section" class="section">
+  <canvas id="stars-canvas" class="bg-canvas" aria-hidden="true"></canvas>
+  <div class="section-inner stars-copy">
+    <span class="eyebrow">Under The Same Sky</span>
+    <h2 class="section-title reveal">A Sky Full Of Wishes</h2>
+    <p class="section-sub reveal" style="margin-inline:auto;">Move your cursor across the stars and keep an eye out for the ones that fall.</p>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 10 — WISH LANTERN
+     ========================================================================== -->
+<section id="lantern-section" class="section">
+  <div class="section-inner">
+    <span class="eyebrow">Send A Wish</span>
+    <h2 class="section-title reveal">Light A Lantern</h2>
+    <p class="section-sub reveal" style="margin-inline:auto;">Click the lantern and let it carry a wish into the sky.</p>
+
+    <div class="lantern-stage">
+      <div class="lantern" id="lantern" role="button" tabindex="0" aria-label="Release the wish lantern">
+        <svg viewBox="0 0 70 100" width="70" height="100">
+          <defs>
+            <radialGradient id="lanternGlow" cx="50%" cy="50%" r="60%">
+              <stop offset="0%" stop-color="#fff3c4"/><stop offset="100%" stop-color="#ffb347"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="35" cy="8" rx="16" ry="4" fill="#c9974f"/>
+          <path d="M12,10 L58,10 L50,80 L20,80 Z" fill="url(#lanternGlow)" stroke="#e0a24e" stroke-width="2"/>
+          <ellipse cx="35" cy="80" rx="15" ry="4" fill="#c9974f"/>
+          <rect x="30" y="84" width="10" height="10" fill="#8a5a2b"/>
+        </svg>
+      </div>
+    </div>
+    <p class="lantern-wish" id="lantern-wish">May every wish you make quietly come true.</p>
+    <p class="lantern-hint">tap the lantern</p>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 11 — COUNTDOWN (time since her birth date)
+     EDIT the birth date in script.js CONFIG.birthDate
+     ========================================================================== -->
+<section id="countdown-section" class="section section--dream">
+  <div class="section-inner">
+    <span class="eyebrow" style="display:block;text-align:center;">Every Second Counts</span>
+    <h2 class="section-title reveal" style="text-align:center;">Celebrating Every Moment</h2>
+    <div class="countdown-grid reveal">
+      <div class="cd-unit glass"><span class="cd-value" id="cd-years">00</span><span class="cd-label">Years</span></div>
+      <div class="cd-unit glass"><span class="cd-value" id="cd-months">00</span><span class="cd-label">Months</span></div>
+      <div class="cd-unit glass"><span class="cd-value" id="cd-days">00</span><span class="cd-label">Days</span></div>
+      <div class="cd-unit glass"><span class="cd-value" id="cd-hours">00</span><span class="cd-label">Hours</span></div>
+      <div class="cd-unit glass"><span class="cd-value" id="cd-minutes">00</span><span class="cd-label">Minutes</span></div>
+      <div class="cd-unit glass"><span class="cd-value" id="cd-seconds">00</span><span class="cd-label">Seconds</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 12 — FRIENDSHIP STATISTICS
+     ========================================================================== -->
+<section id="stats-section" class="section section--night">
+  <div class="section-inner">
+    <span class="eyebrow">By The Numbers</span>
+    <h2 class="section-title reveal">Friendship Statistics</h2>
+    <div class="stats-grid">
+      <div class="stat-card glass reveal"><span class="stat-value" data-count="9999">0</span><span class="stat-label">Smiles Shared</span></div>
+      <div class="stat-card glass reveal"><span class="stat-value" data-count="2500">0</span><span class="stat-label">Conversations</span></div>
+      <div class="stat-card glass reveal"><span class="stat-value" data-count="1200">0</span><span class="stat-label">Laughs Together</span></div>
+      <div class="stat-card glass reveal"><span class="stat-value" data-count="365">0</span><span class="stat-label">Memories Made</span></div>
+      <div class="stat-card glass reveal"><span class="stat-value" data-count="100" data-suffix="%">0</span><span class="stat-label">Support Level</span></div>
+      <div class="stat-card glass reveal"><span class="stat-value" data-count="100" data-suffix="%">0</span><span class="stat-label">Friendship Level</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 13 — INTERACTIVE MEMORY TREE
+     ========================================================================== -->
+<section id="tree-section" class="section">
+  <div class="tree-stage">
+    <svg class="tree-svg" viewBox="0 0 400 460" id="tree-svg" aria-label="Memory tree, click the leaves">
+      <path d="M200,460 C190,380 210,340 195,260 C180,190 220,150 200,80" stroke="#5a3b2e" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <path d="M200,260 C160,240 120,250 90,210" stroke="#5a3b2e" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <path d="M198,220 C240,200 270,210 300,180" stroke="#5a3b2e" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <path d="M200,150 C170,130 150,120 120,100" stroke="#5a3b2e" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <path d="M202,140 C230,110 250,110 280,90" stroke="#5a3b2e" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <!-- leaves: data-index maps to a photo + short memory caption, handled in script.js -->
+      <g id="tree-leaves">
+        <circle class="tree-leaf" data-index="0" cx="90" cy="205" r="16" fill="#ff8fb3"/>
+        <circle class="tree-leaf" data-index="1" cx="300" cy="175" r="16" fill="#b28dff"/>
+        <circle class="tree-leaf" data-index="2" cx="120" cy="95" r="14" fill="#ffd27a"/>
+        <circle class="tree-leaf" data-index="3" cx="280" cy="85" r="14" fill="#8ecbff"/>
+        <circle class="tree-leaf" data-index="4" cx="200" cy="75" r="15" fill="#ff8fb3"/>
+        <circle class="tree-leaf" data-index="5" cx="160" cy="180" r="13" fill="#b28dff"/>
+        <circle class="tree-leaf" data-index="6" cx="240" cy="230" r="13" fill="#ffd27a"/>
+        <circle class="tree-leaf" data-index="7" cx="170" cy="250" r="12" fill="#8ecbff"/>
+      </g>
+    </svg>
+    <p class="tree-hint">click a leaf to open a memory</p>
+  </div>
+  <div class="section-inner reveal" style="text-align:center;position:relative;top:-4vh;">
+    <span class="eyebrow">Growing Together</span>
+    <h2 class="section-title">The Memory Tree</h2>
+  </div>
+</section>
+
+<div id="leaf-modal">
+  <div class="leaf-modal-card glass">
+    <img id="leaf-modal-img" src="" alt="" loading="lazy" />
+    <p id="leaf-modal-text"></p>
+    <button class="btn leaf-modal-close" id="leaf-modal-close">Close</button>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     SECTION 14 — FINAL GALLERY EXPLOSION
+     ========================================================================== -->
+<section id="explosion-section" class="section">
+  <canvas class="bg-canvas" id="explosion-canvas" aria-hidden="true"></canvas>
+  <div class="section-inner" style="text-align:center;">
+    <span class="eyebrow">One More Look</span>
+    <h2 class="section-title reveal">Every Memory, All At Once</h2>
+  </div>
+  <div class="explosion-stage" id="explosion-stage"><!-- populated by script.js --></div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 15 — ENDING
+     EDIT: closing lines below
+     ========================================================================== -->
+<section id="ending-section" class="section">
+  <canvas id="fireworks-canvas" aria-hidden="true"></canvas>
+  <div class="ending-content">
+    <span class="eyebrow" style="color:var(--gold-soft);">The End (For Now)</span>
+    <h2 class="ending-title"><span class="letters" data-text="Happy Birthday Priti"></span></h2>
+    <p class="ending-line">May your smile keep lighting every place you go.</p>
+    <p class="ending-thanks">Thank you for being an amazing friend today and every day. Here's to celebrating you, always.</p>
+    <button class="btn surprise-btn" id="surprise-btn">Tap For One Last Surprise 🎉</button>
+  </div>
+</section>
+
+</main>
+
+<div id="celebration-overlay">
+  <canvas id="celebration-canvas"></canvas>
+  <button class="celebration-close" id="celebration-close" aria-label="Close celebration">✕</button>
+  <h2>Happy Birthday!</h2>
+</div>
+
+<footer>
+  <p>Made with <span class="footer-heart">♥</span> for Priti</p>
+  <p class="footer-note">A small website, built with a lot of care.</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
