@@ -1,5 +1,5 @@
 /* ============================================================================
-   HAPPY BIRTHDAY ANUSHRI — SCRIPT
+   HAPPY BIRTHDAY PRITI — SCRIPT
    ----------------------------------------------------------------------------
    TABLE OF CONTENTS (search for these headers):
      0.  CONFIG                 <-- EDIT dates / names / counts here
@@ -34,7 +34,7 @@
      0. CONFIG — personalize your site here
      ========================================================================== */
   const CONFIG = {
-    friendName: 'Anushri',
+    friendName: 'Priti',
 
     // EDIT: her real birth date "YYYY-MM-DD" — powers the Countdown section
     // (Section 11 shows the exact years/months/days/hours/minutes/seconds since this date)
